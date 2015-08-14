@@ -1,0 +1,33 @@
+{
+  "name": "kmarenov/skeeks-cms-instagram-component",
+  "description": "Instagram component for SkeekS CMS",
+  "keywords": [
+    "yii",
+    "app",
+    "skeeks",
+    "sx",
+    "instagram"
+  ],
+  "homepage": "http://www.skeeks.com/",
+  "type": "yii2-extension",
+  "license": "BSD-3-Clause",
+  "support": {
+    "issues": "http://www.skeeks.com/",
+    "wiki": "http://cms.skeeks.com/wiki/",
+    "source": "https://github.com/kmarenov/skeeks-cms-instagram-component"
+  },
+  "authors": [
+    {
+      "name": "Kirill Marenov",
+      "email": "kmarenov@gmail.com"
+    }
+  ],
+  "require": {
+    "cosenary/instagram": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "skeeks\\cms\\instagram\\": ""
+    }
+  }
+}
