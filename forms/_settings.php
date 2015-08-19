@@ -10,8 +10,8 @@ use yii\helpers\Html;
 
 
 <?= $form->fieldSet('Основное'); ?>
-<?= $form->field($model, 'accessToken')->hint('Ваш Access Token для доступа к API Instagram'); ?>
-<?= $form->fieldInputInt($model, 'userId')->hint('ID пользователя Instagram, фотографии которого нужно показывать'); ?>
+<?= $form->field($model, 'clientId')->hint('CLIENT ID для доступа к API'); ?>
+<?= $form->field($model, 'userName')->hint('Имя пользователя, фотографии которого показывать'); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

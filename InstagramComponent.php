@@ -1,6 +1,7 @@
 <?php
 namespace skeeks\cms\instagram;
 
+use MetzWeb\Instagram\Instagram;
 use skeeks\cms\base\Component;
 use yii\helpers\ArrayHelper;
 
@@ -12,14 +13,14 @@ class InstagramComponent extends Component
 {
 
     /**
-     * @var string Access Token
+     * @var string Client ID
      */
-    public $accessToken;
+    public $clientId;
 
     /**
-     * @var int User ID
+     * @var int Username
      */
-    public $userId;
+    public $userName;
 
     /**
      * Можно задать название и описание компонента
@@ -45,17 +46,15 @@ class InstagramComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['accessToken'], 'string'],
-            [['userId'], 'integer'],
-            [['accessToken', 'userId'], 'required'],
+            [['clientId', 'userName'], 'required'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'accessToken' => 'Access Token',
-            'userId' => 'ID пользователя',
+            'clientId' => 'CLIENT ID для доступа к API',
+            'userName' => 'Имя пользователя, фотографии которого показывать',
         ]);
     }
 
@@ -63,37 +62,33 @@ class InstagramComponent extends Component
      * Получение данных из Instagram
      * @return array
      */
-    public function fetchData($userId = 0, $accessToken = '')
+    public function fetchData($userName = '', $clientId = '')
     {
-
-        if (empty($accessToken)) {
-            $accessToken = $this->accessToken;
+        if (empty($userName)) {
+            $userName = $this->userName;
         }
 
-        if ($userId == 0) {
-            $userId = $this->userId;
+        if (empty($clientId)) {
+            $clientId = $this->clientId;
         }
 
         $result = array();
 
-        if (empty($accessToken) || empty($userId)) {
+        if (empty($clientId) || empty($userName)) {
             return $result;
         }
 
-        $url = "https://api.instagram.com/v1/users/" . $userId . "/media/recent?access_token=" . $accessToken;
+        $instagram = new Instagram($clientId);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-        $json = curl_exec($ch);
-        curl_close($ch);
+        $users = json_decode(json_encode($instagram->searchUser($userName, 1)), true);
 
-        if (empty($json)) {
+        $userId = $users['data'][0]['id'];
+
+        if (!$userId) {
             return $result;
         }
 
-        $result = json_decode($json, true);
+        $result = json_decode(json_encode($instagram->getUserMedia($userId, 20)), true);
 
         return $result;
     }
