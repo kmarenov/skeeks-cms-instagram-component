@@ -46,7 +46,7 @@ class InstagramComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['clientId', 'userName'], 'required'],
+            [['clientId', 'userName'], 'safe'],
         ]);
     }
 
