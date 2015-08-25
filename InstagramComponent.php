@@ -23,6 +23,16 @@ class InstagramComponent extends Component
     public $userName;
 
     /**
+     * @var MetzWeb\Instagram\Instagram
+     */
+    public $instagram;
+
+    /**
+     * @var string
+     */
+    public $error_message;
+
+    /**
      * Можно задать название и описание компонента
      * @return array
      */
@@ -31,6 +41,21 @@ class InstagramComponent extends Component
         return array_merge(parent::descriptorConfig(), [
             'name' => 'Настройки Instagram',
         ]);
+    }
+
+    function init($userName = '', $clientId = '')
+    {
+        parent::init();
+
+        if (!empty($userName)) {
+            $this->userName = $userName;
+        }
+
+        if (!empty($clientId)) {
+            $this->clientId = $clientId;
+        }
+
+        $this->instagram = new Instagram($this->clientId);
     }
 
     /**
@@ -59,37 +84,52 @@ class InstagramComponent extends Component
     }
 
     /**
-     * Получение данных из Instagram
+     * Получение фотографий пользователя из Instagram
      * @return array
      */
-    public function fetchData($userName = '', $clientId = '')
+    public function findMediaByUser()
     {
+        $user = $this->findUser();
+
+        if (empty($user)) {
+            return array();
+        }
+
+        $media = json_decode(json_encode($this->instagram->getUserMedia($user['id'], 12)), true);
+
+        if (!empty($media['meta']['error_message'])) {
+            $this->error_message = $media['meta']['error_message'];
+            return array();
+        }
+
+        return $media;
+    }
+
+    /**
+     * Поиск пользователя Instagram
+     * @return array
+     */
+    public function findUser()
+    {
+        $userName = $this->userName;
+
         if (empty($userName)) {
-            $userName = $this->userName;
+            return array();
         }
 
-        if (empty($clientId)) {
-            $clientId = $this->clientId;
+        $users = json_decode(json_encode($this->instagram->searchUser($userName, 1)), true);
+
+        if (!empty($users['meta']['error_message'])) {
+            $this->error_message = $users['meta']['error_message'];
+            return array();
         }
 
-        $result = array();
+        $user = $users['data'][0];
 
-        if (empty($clientId) || empty($userName)) {
-            return $result;
+        if (empty($user)) {
+            return array();
         }
 
-        $instagram = new Instagram($clientId);
-
-        $users = json_decode(json_encode($instagram->searchUser($userName, 1)), true);
-
-        $userId = $users['data'][0]['id'];
-
-        if (!$userId) {
-            return $result;
-        }
-
-        $result = json_decode(json_encode($instagram->getUserMedia($userId, 20)), true);
-
-        return $result;
+        return $user;
     }
 }
