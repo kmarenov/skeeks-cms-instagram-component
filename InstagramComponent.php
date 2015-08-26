@@ -43,18 +43,9 @@ class InstagramComponent extends Component
         ]);
     }
 
-    function init($userName = '', $clientId = '')
+    function init()
     {
         parent::init();
-
-        if (!empty($userName)) {
-            $this->userName = $userName;
-        }
-
-        if (!empty($clientId)) {
-            $this->clientId = $clientId;
-        }
-
         $this->instagram = new Instagram($this->clientId);
     }
 
@@ -89,13 +80,19 @@ class InstagramComponent extends Component
      */
     public function findMediaByUser()
     {
-        $user = $this->findUser();
+        $key = 'kmarenov_instagram_find_media_by_user_' . $this->userName;
 
-        if (empty($user)) {
-            return array();
+        $media = \Yii::$app->cache->get($key);
+
+        if ($media === false) {
+            $user = $this->findUser();
+
+            if (!empty($user)) {
+                $media = json_decode(json_encode($this->instagram->getUserMedia($user['id'], 12)), true);
+            }
+
+            \Yii::$app->cache->set($key, $media, 3600);
         }
-
-        $media = json_decode(json_encode($this->instagram->getUserMedia($user['id'], 12)), true);
 
         if (!empty($media['meta']['error_message'])) {
             $this->error_message = $media['meta']['error_message'];
@@ -117,19 +114,50 @@ class InstagramComponent extends Component
             return array();
         }
 
-        $users = json_decode(json_encode($this->instagram->searchUser($userName, 1)), true);
+        $key = 'kmarenov_instagram_find_user_' . $userName;
 
-        if (!empty($users['meta']['error_message'])) {
-            $this->error_message = $users['meta']['error_message'];
+        $user = \Yii::$app->cache->get($key);
+
+        if ($user === false) {
+            $users = json_decode(json_encode($this->instagram->searchUser($userName, 1)), true);
+
+            if (!empty($users['meta']['error_message'])) {
+                $this->error_message = $users['meta']['error_message'];
+            } else {
+                $user_id = $users['data'][0]["id"];
+
+                if (!empty($user_id)) {
+                    $user = json_decode(json_encode($this->instagram->getUser($user_id)), true);
+                }
+            }
+
+            \Yii::$app->cache->set($key, $user, 3600);
+        }
+
+        if (!empty($user['meta']['error_message'])) {
+            $this->error_message = $user['meta']['error_message'];
             return array();
         }
 
-        $user = $users['data'][0];
-
-        if (empty($user)) {
+        if (empty($user['data'])) {
             return array();
         }
 
-        return $user;
+        return $user['data'];
+    }
+
+    public function setUserName($userName)
+    {
+        if (!empty($userName)) {
+            $this->userName = $userName;
+        }
+    }
+
+    public function setClientId($clientId)
+    {
+        if (!empty($clientId)) {
+            $this->clientId = $clientId;
+            $this->instagram->setApiKey($clientId);
+        }
     }
 }
