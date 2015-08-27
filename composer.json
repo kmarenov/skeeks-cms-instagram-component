@@ -23,6 +23,7 @@
     }
   ],
   "require": {
+    "skeeks/cms": "*",
     "cosenary/instagram": "*"
   },
   "autoload": {

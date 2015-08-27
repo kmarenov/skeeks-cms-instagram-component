@@ -18,14 +18,34 @@ class InstagramComponent extends Component
     public $clientId;
 
     /**
-     * @var int Username
+     * @var string Username
      */
     public $userName;
+
+    /**
+     * @var string tag
+     */
+    public $tag;
 
     /**
      * @var MetzWeb\Instagram\Instagram
      */
     public $instagram;
+
+    /**
+     * @var boolean isCacheEnabled
+     */
+    public $isCacheEnabled = true;
+
+    /**
+     * @var int cacheTime
+     */
+    public $cacheTime = 3600;
+
+    /**
+     * @var int count
+     */
+    public $count = 12;
 
     /**
      * @var string
@@ -62,7 +82,9 @@ class InstagramComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['clientId', 'userName'], 'safe'],
+            [['isCacheEnabled'], 'boolean'],
+            [['cacheTime', 'count'], 'number'],
+            [['clientId', 'userName', 'tag'], 'safe'],
         ]);
     }
 
@@ -70,28 +92,36 @@ class InstagramComponent extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'clientId' => 'CLIENT ID для доступа к API',
-            'userName' => 'Имя пользователя, фотографии которого показывать',
+            'userName' => 'Имя пользователя Instagram',
+            'tag' => 'Тэг',
+            'isCacheEnabled' => 'Включить кэширование',
+            'cacheTime' => 'Время кэширования (в секундах)',
+            'count' => 'Сколько фотографий показывать',
         ]);
     }
 
     /**
-     * Получение фотографий пользователя из Instagram
+     * Получение фотографий пользователя
      * @return array
      */
     public function findMediaByUser()
     {
-        $key = 'kmarenov_instagram_find_media_by_user_' . $this->userName;
+        $key = 'kmarenov_instagram_find_media_by_user_' . $this->userName . '_' . $this->count;
 
-        $media = \Yii::$app->cache->get($key);
+        if ($this->isCacheEnabled) {
+            $media = \Yii::$app->cache->get($key);
+        }
 
-        if ($media === false) {
+        if ($media === false || !$this->isCacheEnabled) {
             $user = $this->findUser();
 
             if (!empty($user)) {
-                $media = json_decode(json_encode($this->instagram->getUserMedia($user['id'], 12)), true);
+                $media = json_decode(json_encode($this->instagram->getUserMedia($user['id'], $this->count)), true);
             }
 
-            \Yii::$app->cache->set($key, $media, 3600);
+            if ($this->isCacheEnabled) {
+                \Yii::$app->cache->set($key, $media, $this->cacheTime);
+            }
         }
 
         if (!empty($media['meta']['error_message'])) {
@@ -103,7 +133,7 @@ class InstagramComponent extends Component
     }
 
     /**
-     * Поиск пользователя Instagram
+     * Поиск пользователя
      * @return array
      */
     public function findUser()
@@ -116,9 +146,11 @@ class InstagramComponent extends Component
 
         $key = 'kmarenov_instagram_find_user_' . $userName;
 
-        $user = \Yii::$app->cache->get($key);
+        if ($this->isCacheEnabled) {
+            $user = \Yii::$app->cache->get($key);
+        }
 
-        if ($user === false) {
+        if ($user === false || !$this->isCacheEnabled) {
             $users = json_decode(json_encode($this->instagram->searchUser($userName, 1)), true);
 
             if (!empty($users['meta']['error_message'])) {
@@ -131,7 +163,9 @@ class InstagramComponent extends Component
                 }
             }
 
-            \Yii::$app->cache->set($key, $user, 3600);
+            if ($this->isCacheEnabled) {
+                \Yii::$app->cache->set($key, $user, $this->cacheTime);
+            }
         }
 
         if (!empty($user['meta']['error_message'])) {
@@ -146,6 +180,36 @@ class InstagramComponent extends Component
         return $user['data'];
     }
 
+    /**
+     * Получение фотографий по тэгу
+     * @return array
+     */
+    public function findMediaByTag()
+    {
+        $key = 'kmarenov_instagram_find_media_by_tag_' . $this->tag . '_' . $this->count;
+
+        if ($this->isCacheEnabled) {
+            $media = \Yii::$app->cache->get($key);
+        }
+
+        if ($media === false || !$this->isCacheEnabled) {
+            if (!empty($this->tag)) {
+                $media = json_decode(json_encode($this->instagram->getTagMedia($this->tag, $this->count)), true);
+            }
+
+            if ($this->isCacheEnabled) {
+                \Yii::$app->cache->set($key, $media, $this->cacheTime);
+            }
+        }
+
+        if (!empty($media['meta']['error_message'])) {
+            $this->error_message = $media['meta']['error_message'];
+            return array();
+        }
+
+        return $media;
+    }
+
     public function setUserName($userName)
     {
         if (!empty($userName)) {
@@ -158,6 +222,20 @@ class InstagramComponent extends Component
         if (!empty($clientId)) {
             $this->clientId = $clientId;
             $this->instagram->setApiKey($clientId);
+        }
+    }
+
+    public function setTag($tag)
+    {
+        if (!empty($tag)) {
+            $this->tag = $tag;
+        }
+    }
+
+    public function setCount($count)
+    {
+        if (!empty($count)) {
+            $this->count = $count;
         }
     }
 }
