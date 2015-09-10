@@ -1,5 +1,5 @@
 {
-  "name": "kmarenov/skeeks-cms-instagram-component",
+  "name": "rusoft/skeeks-cms-instagram-component",
   "description": "Instagram component for SkeekS CMS",
   "keywords": [
     "yii",
@@ -14,7 +14,7 @@
   "support": {
     "issues": "http://www.skeeks.com/",
     "wiki": "http://cms.skeeks.com/wiki/",
-    "source": "https://github.com/kmarenov/skeeks-cms-instagram-component"
+    "source": "https://github.com/rusoft/skeeks-cms-instagram-component"
   },
   "authors": [
     {

@@ -106,7 +106,7 @@ class InstagramComponent extends Component
      */
     public function findMediaByUser()
     {
-        $key = 'kmarenov_instagram_find_media_by_user_' . $this->userName . '_' . $this->count;
+        $key = 'rusoft_instagram_find_media_by_user_' . $this->userName . '_' . $this->count;
 
         if ($this->isCacheEnabled) {
             $media = \Yii::$app->cache->get($key);
@@ -144,7 +144,7 @@ class InstagramComponent extends Component
             return array();
         }
 
-        $key = 'kmarenov_instagram_find_user_' . $userName;
+        $key = 'rusoft_instagram_find_user_' . $userName;
 
         if ($this->isCacheEnabled) {
             $user = \Yii::$app->cache->get($key);
@@ -186,7 +186,7 @@ class InstagramComponent extends Component
      */
     public function findMediaByTag()
     {
-        $key = 'kmarenov_instagram_find_media_by_tag_' . $this->tag . '_' . $this->count;
+        $key = 'rusoft_instagram_find_media_by_tag_' . $this->tag . '_' . $this->count;
 
         if ($this->isCacheEnabled) {
             $media = \Yii::$app->cache->get($key);
