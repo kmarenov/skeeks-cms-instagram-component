@@ -8,12 +8,12 @@
     "sx",
     "instagram"
   ],
-  "homepage": "http://www.skeeks.com/",
+  "homepage": "http://rusoft.ru/",
   "type": "yii2-extension",
   "license": "BSD-3-Clause",
   "support": {
-    "issues": "http://www.skeeks.com/",
-    "wiki": "http://cms.skeeks.com/wiki/",
+    "issues": "https://github.com/rusoft/skeeks-cms-instagram-component/issues",
+    "wiki": "https://github.com/rusoft/skeeks-cms-instagram-component/wiki",
     "source": "https://github.com/rusoft/skeeks-cms-instagram-component"
   },
   "authors": [
