@@ -6,6 +6,7 @@ use skeeks\cms\base\Component;
 use yii\helpers\ArrayHelper;
 
 /**
+ * @property MetzWeb\Instagram\Instagram $instagram
  * Class InstagramComponent
  * @package skeeks\cms\instagram
  */
@@ -26,11 +27,6 @@ class InstagramComponent extends Component
      * @var string tag
      */
     public $tag;
-
-    /**
-     * @var MetzWeb\Instagram\Instagram
-     */
-    public $instagram;
 
     /**
      * @var boolean isCacheEnabled
@@ -63,10 +59,22 @@ class InstagramComponent extends Component
         ]);
     }
 
-    function init()
+    /**
+     * @var MetzWeb\Instagram\Instagram
+     */
+    private $_instagram = null;
+
+    /**
+     * @return Instagram
+     */
+    public function getInstagram()
     {
-        parent::init();
-        $this->instagram = new Instagram($this->clientId);
+        if ($this->_instagram === null)
+        {
+            $this->_instagram = new Instagram($this->clientId);
+        }
+
+        return $this->_instagram;
     }
 
     /**
