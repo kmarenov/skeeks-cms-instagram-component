@@ -1,5 +1,5 @@
 {
-  "name": "rusoft/skeeks-cms-instagram-component",
+  "name": "skeeks/cms-instagram-component",
   "description": "Instagram component for SkeekS CMS",
   "keywords": [
     "yii",
@@ -8,7 +8,7 @@
     "sx",
     "instagram"
   ],
-  "homepage": "http://rusoft.ru/",
+  "homepage": "http://skeeks.com/",
   "type": "yii2-extension",
   "license": "BSD-3-Clause",
   "support": {
