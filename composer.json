@@ -30,5 +30,10 @@
     "psr-4": {
       "skeeks\\cms\\instagram\\": ""
     }
-  }
+  },
+    "extra": {
+        "config-plugin": {
+            "web": "config/main.php"
+        }
+    }
 }
